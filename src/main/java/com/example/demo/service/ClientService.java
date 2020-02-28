@@ -13,7 +13,6 @@ import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @RequiredArgsConstructor
 @Service
@@ -26,11 +25,11 @@ public class ClientService {
     }
 
     public List<Client> merge() {
+        List<Client> mergedClientList;
         List<Client> clients = clientRepository.findAll();
-        List<String> riskProfiles = StreamSupport.stream(clients.spliterator(), false)
-                .map(Client::getRiskProfile)
-                .distinct().collect(Collectors.toList());
-        return mergeClients(clients, riskProfiles);
+        Client client = findClientWithTheHighestRiskProfile();
+        mergedClientList = mergeClients(clients, client.getRiskProfile());
+        return mergedClientList;
     }
 
     public Client getClient(Long id) {
@@ -52,19 +51,20 @@ public class ClientService {
         clientRepository.deleteById(id);
     }
 
-    private List<Client> mergeClients(List<Client> clients, List<String> riskProfiles) {
-        List<Client> mergedClients;
-        if (riskProfiles.contains(RiskProfile.HIGH.name())) {
-            mergedClients = StreamSupport.stream(clients.spliterator(), false)
-                    .peek(client -> client.setRiskProfile(RiskProfile.HIGH.name())).collect(Collectors.toList());
-        } else if (riskProfiles.contains(RiskProfile.NORMAL.name())) {
-            mergedClients = StreamSupport.stream(clients.spliterator(), false)
-                    .peek(client -> client.setRiskProfile(RiskProfile.NORMAL.name())).collect(Collectors.toList());
+    private Client findClientWithTheHighestRiskProfile() {
+        Client client;
+        if (clientRepository.existsByRiskProfile(RiskProfile.HIGH.name())) {
+            client = new Client(RiskProfile.HIGH.name());
+        } else if (clientRepository.existsByRiskProfile(RiskProfile.NORMAL.name())) {
+            client = new Client(RiskProfile.NORMAL.name());
         } else {
-            mergedClients = StreamSupport.stream(clients.spliterator(), false)
-                    .peek(client -> client.setRiskProfile(RiskProfile.LOW.name())).collect(Collectors.toList());
+            client = new Client(RiskProfile.LOW.name());
         }
-        return mergedClients;
+        return client;
+    }
+
+    private List<Client> mergeClients(List<Client> clients, String riskProfile) {
+        return clients.stream().peek(client -> client.setRiskProfile(riskProfile)).collect(Collectors.toList());
     }
 
     private void checkResource(ClientDTO clientDTO) {
