@@ -20,37 +20,36 @@ public class ClientRestController {
     private final ClientService clientService;
 
     @GetMapping
-    public List<Client> findAll() {
-        return clientService.findAll();
+    public List<Client> getAllResources() {
+        return clientService.findAllClients();
     }
 
     @GetMapping("/merge")
-    public List<Client> merge() {
-        return clientService.merge();
+    public List<Client> getMergedResources() {
+        return clientService.mergeClients();
     }
 
     @GetMapping(value = "/{id}")
-    public Client findById(@PathVariable("id") Long id) {
+    public Client findResourceById(@PathVariable("id") Long id) {
         return clientService.getClient(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Client create(@RequestBody ClientDTO clientDTO) {
-        return clientService.create(clientDTO);
+    public Client createResource(@RequestBody ClientDTO clientDTO) {
+        return clientService.createClient(clientDTO);
     }
 
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable( "id" ) Long id, @RequestBody ClientDTO clientDTO) {
-        Client client = clientService.getClient(id);
-        clientService.update(client, clientDTO);
+    public void updateResource(@PathVariable( "id" ) Long id, @RequestBody ClientDTO clientDTO) {
+        clientService.updateClient(id, clientDTO);
     }
 
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable("id") Long id) {
-        clientService.deleteById(id);
+    public void deleteResource(@PathVariable("id") Long id) {
+        clientService.deleteClientById(id);
     }
 
     @ExceptionHandler(InvalidResourceException.class)

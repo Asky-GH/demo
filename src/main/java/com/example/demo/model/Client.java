@@ -1,11 +1,13 @@
 package com.example.demo.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Data
+@AllArgsConstructor
 @Entity
 @Table(name = "TBL_CLIENTS")
 public class Client implements Serializable {

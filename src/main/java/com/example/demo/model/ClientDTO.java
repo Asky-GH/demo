@@ -1,9 +1,16 @@
 package com.example.demo.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class ClientDTO {
+@AllArgsConstructor
+public class ClientDTO implements Serializable {
 
     private String riskProfile;
+
+    public ClientDTO() {
+    }
 }
